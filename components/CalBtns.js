@@ -11,7 +11,7 @@ const CalBtns = ({ onPress }) => {
   ];
 
   return (
-    <View style={{ marginBottom: 20 }}>
+    <View>
       {rows.map((row, rowIndex) => (
         <View
           key={rowIndex}

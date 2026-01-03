@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import CalBtns from "./components/CalBtns";
 import Display from "./components/Display";
+import { buttonLabels } from "./Constants/buttonLabels";
 
 const { width, height } = Dimensions.get("window");
 
@@ -61,7 +62,7 @@ export default function App() {
 
   const handlePress = (input) => {
     if (input === "AC") return setValue("0");
-    if (input === "C") {
+    if (input === buttonLabels.clearEntry) {
       setValue((prev) => {
         if (!cursor || cursor.start === prev.length) {
           // cut from end

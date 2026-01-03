@@ -20,10 +20,23 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.suhaslakhani.calculatorApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "de25cf2f-34d2-4fce-8254-f4469b7117e2"
+      }
+    },
+    "owner": "suhaslakhani",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/de25cf2f-34d2-4fce-8254-f4469b7117e2"
     }
   }
 }

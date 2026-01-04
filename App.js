@@ -16,42 +16,58 @@ const CALC_HEIGHT = height * 0.8;
 export default function App() {
   const [value, setValue] = useState("0");
   const [cursor, setCursor] = useState(null);
+  const [previewResult, setPreviewResult] = useState(null);
+
+  const isValidExpression = (expr) => {
+    return /[0-9)]$/.test(expr); // must end with a number or )
+  };
 
   const calculate = (expression) => {
     try {
       const operators = ["+", "-", "*", "/"];
-      let numbers = [];
+      let tokens = [];
       let current = "";
 
-      for (let char of expression) {
-        if (operators.includes(char)) {
-          numbers.push(Number(current));
-          numbers.push(char);
+      // Tokenize expression
+      for (let i = 0; i < expression.length; i++) {
+        const char = expression[i];
+
+        if (char === "%") {
+          // Convert last number into percentage
+          const value = Number(current || tokens.pop());
+          tokens.push(value / 100);
+          current = "";
+        } else if (operators.includes(char)) {
+          tokens.push(Number(current));
+          tokens.push(char);
           current = "";
         } else {
           current += char;
         }
       }
-      numbers.push(Number(current));
 
-      for (let i = 0; i < numbers.length; i++) {
-        if (numbers[i] === "*" || numbers[i] === "/") {
+      if (current !== "") {
+        tokens.push(Number(current));
+      }
+
+      // Handle * and /
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i] === "*" || tokens[i] === "/") {
           const result =
-            numbers[i] === "*"
-              ? numbers[i - 1] * numbers[i + 1]
-              : numbers[i - 1] / numbers[i + 1];
+            tokens[i] === "*"
+              ? tokens[i - 1] * tokens[i + 1]
+              : tokens[i - 1] / tokens[i + 1];
 
-          numbers.splice(i - 1, 3, result);
+          tokens.splice(i - 1, 3, result);
           i--;
         }
       }
 
-      let result = numbers[0];
-      for (let i = 1; i < numbers.length; i += 2) {
+      // Handle + and -
+      let result = tokens[0];
+      for (let i = 1; i < tokens.length; i += 2) {
         result =
-          numbers[i] === "+"
-            ? result + numbers[i + 1]
-            : result - numbers[i + 1];
+          tokens[i] === "+" ? result + tokens[i + 1] : result - tokens[i + 1];
       }
 
       return result;
@@ -61,7 +77,12 @@ export default function App() {
   };
 
   const handlePress = (input) => {
-    if (input === "AC") return setValue("0");
+    if (input === "AC") {
+      setValue("0");
+      setPreviewResult(null);
+      return;
+    }
+
     if (input === buttonLabels.clearEntry) {
       setValue((prev) => {
         if (!cursor || cursor.start === prev.length) {
@@ -77,9 +98,29 @@ export default function App() {
       });
       return;
     }
-    if (input === "=") return setValue(calculate(value).toString());
+    if (input === "=") {
+      const result = calculate(value);
+      setValue(result.toString());
+      setPreviewResult(null);
+      return;
+    }
 
-    setValue((prev) => (prev === "0" ? input : prev + input));
+    setValue((prev) => {
+      const nextValue = prev === "0" ? input : prev + input;
+
+      if (isValidExpression(nextValue)) {
+        const result = calculate(nextValue);
+        if (result !== "Error" && result !== nextValue) {
+          setPreviewResult(result.toString());
+        } else {
+          setPreviewResult(null);
+        }
+      } else {
+        setPreviewResult(null);
+      }
+
+      return nextValue;
+    });
   };
 
   return (
@@ -95,7 +136,11 @@ export default function App() {
           ]}
         >
           <View style={styles.displayContainer}>
-            <Display value={value} onCursorChange={setCursor} />
+            <Display
+              value={value}
+              previewResult={previewResult}
+              onCursorChange={setCursor}
+            />
           </View>
 
           <View style={styles.buttonsContainer}>

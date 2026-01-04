@@ -1,7 +1,7 @@
-import { View, StyleSheet, TextInput } from "react-native";
+import { View, StyleSheet, TextInput, Text } from "react-native";
 import { useState, useEffect, useRef } from "react";
 
-const Display = ({ value, onCursorChange }) => {
+const Display = ({ value, previewResult, onCursorChange }) => {
   const prevValueRef = useRef(value);
   const prevSelectionRef = useRef({ start: value.length, end: value.length });
   const userSelectionRef = useRef(false);
@@ -60,6 +60,9 @@ const Display = ({ value, onCursorChange }) => {
         }}
         style={[styles.text, { fontSize: getFontSize(value) }]}
       />
+      {previewResult !== null && (
+        <Text style={styles.preview}>{previewResult}</Text>
+      )}
     </View>
   );
 };
@@ -72,6 +75,12 @@ const styles = StyleSheet.create({
   text: {
     color: "white",
     fontWeight: "bold",
+  },
+  preview: {
+    fontSize: 24,
+    color: "#aaa",
+    textAlign: "right",
+    marginTop: 4,
   },
 });
 
